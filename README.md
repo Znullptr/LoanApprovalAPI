@@ -2,7 +2,7 @@
 
 This is a Django REST API provides a loan approval prediction service based on user information. It uses a neural network learning model to predict whether a loan application will be approved or not.  
 
-The API is deployed on Render and can be accessed at:  https://loanapproval-kww8.onrender.com  
+The API is deployed on Render and can be accessed at:  https://loanapproval-q4gx.onrender.com  
 
 The Folder 'ML_MODEL' contains the neural model i used in this API along with bankloan dataset in format csv file.  
 
