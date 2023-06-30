@@ -21,7 +21,7 @@ class ApprovalsView(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         prediction_result = self.perform_prediction(serializer.validated_data)
-        response_data = {**serializer.validated_data, 'status': prediction_result}
+        response_data = {'status': prediction_result}
         headers = self.get_success_headers(serializer.data)
         return Response(response_data, status=201, headers=headers)
 
