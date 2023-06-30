@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Status</title>
+</head>
+<body style="padding: 10px">
+<h1>Application Status</h1>
+<h3>your submitted data is:</h3>
+<br>
+   <ul>
+        {% for key, value in data.items %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+   </ul>
+<br>
+<h3>your loan status is:</h3>
+<br>
+{{ status }}
+</body>
+</html>

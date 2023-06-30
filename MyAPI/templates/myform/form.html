@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form</title>
+</head>
+<body>
+<h1>Loan Apply Form</h1>
+    <form id="myForm" method="POST" action="{% url 'Status' %}" data-url="{% url 'Form' %}">
+       {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
