@@ -1,8 +1,6 @@
-import traceback
 import pandas as pd
 import numpy as np
 from django.shortcuts import render
-from environ import logger
 from rest_framework import viewsets
 import joblib
 from rest_framework.response import Response
@@ -24,13 +22,18 @@ class ApprovalsView(viewsets.ModelViewSet):
     serializer_class = ApprovalsSerializers
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        prediction_result = perform_prediction(serializer.validated_data)
-        response_data = {'status': prediction_result}
-        headers = self.get_success_headers(serializer.data)
-        return Response(response_data, status=201, headers=headers)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            prediction_result = perform_prediction(serializer.validated_data)
+            response_data = {'status': prediction_result}
+            headers = self.get_success_headers(serializer.data)
+            return Response(response_data, status=201, headers=headers)
+
+        except ValueError as e:
+            error_message = str(e)
+            return Response({'message': error_message}, status=400)
 
 
 # Approve or reject loan
@@ -52,14 +55,10 @@ def approve_or_reject(df):
         scaled_data = scaler.transform(data)
         y_pred = mdl.predict(scaled_data) > 0.53
         return np.where(y_pred, 'Approved', 'Declined')
-    except Exception as e:
 
-        logger.exception("An error occurred during loan prediction.")
-        # Print the traceback for more detailed information
-        traceback.print_exc()
-
-        # Return an error response with the exception message
-        return Response({'status': 'error', 'message': str(e)}, status=500)
+    except Exception:
+        error_message = 'An error occurred during loan prediction.'
+        raise ValueError(error_message)
 
 
 def cxstatus(request):
