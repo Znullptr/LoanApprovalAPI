@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from django.shortcuts import render
 from environ import logger
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 import joblib
 from rest_framework.response import Response
 from .forms import ApprovalForm
@@ -11,7 +11,14 @@ from .models import Approvals
 from .serializers import ApprovalsSerializers
 import tensorflow as tf
 
+
 # Create your views here.
+def perform_prediction(validated_data):
+    df = pd.DataFrame(validated_data, index=[0])
+    loan_status = approve_or_reject(df)
+    return loan_status
+
+
 class ApprovalsView(viewsets.ModelViewSet):
     queryset = Approvals.objects.all()
     serializer_class = ApprovalsSerializers
@@ -20,19 +27,14 @@ class ApprovalsView(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        prediction_result = self.perform_prediction(serializer.validated_data)
+        prediction_result = perform_prediction(serializer.validated_data)
         response_data = {'status': prediction_result}
         headers = self.get_success_headers(serializer.data)
         return Response(response_data, status=201, headers=headers)
 
-    def perform_prediction(self, validated_data):
-        df = pd.DataFrame(validated_data, index=[0])
-        loan_status = approvereject(df)
-        return loan_status
-
 
 # Approve or reject loan
-def approvereject(df):
+def approve_or_reject(df):
     try:
         # Hot encoding data
         mdl = tf.keras.models.load_model('MyAPI/loan_model')
@@ -48,7 +50,7 @@ def approvereject(df):
         data = pd.DataFrame(newdict)
         # Scaling data
         scaled_data = scaler.transform(data)
-        y_pred = mdl.predict(scaled_data) > 0.58
+        y_pred = mdl.predict(scaled_data) > 0.53
         return np.where(y_pred, 'Approved', 'Declined')
     except Exception as e:
 
@@ -92,7 +94,7 @@ def cxstatus(request):
 
         # Create a DataFrame from the dictionary
         df = pd.DataFrame(data, index=[0])
-        loan_status = approvereject(df)
+        loan_status = approve_or_reject(df)
         return render(request, 'myform/status.html', {'status': loan_status, 'data': data})
     return render(request, 'myform/status.html', {'data': 'cannot retrieve data!'})
 
