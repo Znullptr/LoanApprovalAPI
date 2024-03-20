@@ -9,9 +9,6 @@ The Folder 'ML_MODEL' contains the neural model i used in this API along with ba
 # Description:  
 
 Predicts loan approval based on user information. 
-# Endpoints  
-
-###  /api  
 
 Method: POST  
 
